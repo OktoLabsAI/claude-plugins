@@ -39,7 +39,9 @@ jobs:
         run: python tools/ci/userconfig_completeness.py
 
       - name: version consistency
-        run: python tools/ci/version_consistency_check.py --installed-pulse-version 0.1.14
+        run: |
+          PLUGIN_VERSION=$(python -c "import json; print(json.load(open('plugins/okto-pulse/.claude-plugin/plugin.json'))['version'])")
+          python tools/ci/version_consistency_check.py --installed-pulse-version "$PLUGIN_VERSION"
 
       - name: secret scan
         run: tools/ci/secret_scan.sh
