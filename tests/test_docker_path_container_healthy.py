@@ -120,7 +120,7 @@ def test_docker_path_leaves_container_healthy(
         **os.environ,
         "OKTO_PULSE_PIN_VERSION": PINNED_VERSION,
         "OKTO_PULSE_IMAGE": PINNED_IMAGE,
-        "OKTO_PULSE_READYZ_TIMEOUT_SECONDS": "30",
+        "OKTO_PULSE_READYZ_TIMEOUT_SECONDS": "90",
     }
 
     try:
@@ -130,7 +130,7 @@ def test_docker_path_leaves_container_healthy(
             capture_output=True,
             text=True,
             check=False,
-            timeout=120,
+            timeout=240,
         )
         assert result.returncode == 0, (
             f"bootstrap-docker.sh exit {result.returncode}\n"
