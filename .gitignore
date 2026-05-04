@@ -219,3 +219,6 @@ __marimo__/
 
 # Local agent scratch notes (not for public repo)
 .scratchpad/
+
+# Test leakage from claude CLI subprocess tests with stripped env
+undefined/
