@@ -48,6 +48,74 @@ def smoke_install_script() -> Path:
     return REPO_ROOT / "tools" / "ci" / "smoke_install.sh"
 
 
+# ----- R2.x bootstrap surface (paths the R2.2 impl card set will create) -----
+
+@pytest.fixture(scope="session")
+def plugin_root() -> Path:
+    """The plugin source root (corresponds to ${CLAUDE_PLUGIN_ROOT} after install)."""
+    return REPO_ROOT / "plugins" / "okto-pulse"
+
+
+@pytest.fixture(scope="session")
+def bootstrap_local_pip_script(plugin_root: Path) -> Path:
+    return plugin_root / "bin" / "bootstrap-local-pip.sh"
+
+
+@pytest.fixture(scope="session")
+def bootstrap_docker_script(plugin_root: Path) -> Path:
+    return plugin_root / "bin" / "bootstrap-docker.sh"
+
+
+@pytest.fixture(scope="session")
+def bootstrap_remote_script(plugin_root: Path) -> Path:
+    return plugin_root / "bin" / "bootstrap-remote.sh"
+
+
+@pytest.fixture(scope="session")
+def doctor_script(plugin_root: Path) -> Path:
+    return plugin_root / "bin" / "doctor.sh"
+
+
+@pytest.fixture(scope="session")
+def setup_skill_path(plugin_root: Path) -> Path:
+    return plugin_root / "skills" / "setup" / "SKILL.md"
+
+
+@pytest.fixture(scope="session")
+def doctor_skill_path(plugin_root: Path) -> Path:
+    return plugin_root / "skills" / "doctor" / "SKILL.md"
+
+
+@pytest.fixture(scope="session")
+def hooks_json_path(plugin_root: Path) -> Path:
+    return plugin_root / "hooks" / "hooks.json"
+
+
+@pytest.fixture(scope="session")
+def ensure_pulse_up_script(plugin_root: Path) -> Path:
+    return plugin_root / "scripts" / "ensure-pulse-up.sh"
+
+
+@pytest.fixture(scope="session")
+def consolidate_on_compact_script(plugin_root: Path) -> Path:
+    return plugin_root / "scripts" / "consolidate-on-compact.sh"
+
+
+@pytest.fixture(scope="session")
+def stop_validation_gate_script(plugin_root: Path) -> Path:
+    return plugin_root / "scripts" / "stop-validation-gate.sh"
+
+
+@pytest.fixture(scope="session")
+def task_completed_card_sync_script(plugin_root: Path) -> Path:
+    return plugin_root / "scripts" / "task-completed-card-sync.sh"
+
+
+@pytest.fixture(scope="session")
+def docker_compose_path(plugin_root: Path) -> Path:
+    return plugin_root / "deploy" / "docker-compose.yml"
+
+
 @pytest.fixture
 def clean_claude_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Spawn an isolated CLAUDE_HOME for a single test.
