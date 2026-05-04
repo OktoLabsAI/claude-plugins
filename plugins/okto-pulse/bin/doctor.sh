@@ -77,9 +77,9 @@ if [ -z "${READYZ_URL}" ] || [ -z "${MCP_URL}" ]; then
     esac
 fi
 
-AUTH_HEADER=""
+API_KEY_PARAM=""
 if [ -n "${PULSE_API_TOKEN:-}" ]; then
-    AUTH_HEADER="Authorization: Bearer ${PULSE_API_TOKEN}"
+    API_KEY_PARAM="?api_key=${PULSE_API_TOKEN}"
 fi
 
 # ---- Check 1: Python 3.12 (local-pip only) ----------------------------------
@@ -145,11 +145,7 @@ fi
 # ---- Check 6: /readyz returns 200 -------------------------------------------
 HTTP_CODE=""
 if [ -n "${READYZ_URL}" ]; then
-    if [ -n "${AUTH_HEADER}" ]; then
-        HTTP_CODE=$(curl -s -m 3 -o /dev/null -w '%{http_code}' -H "${AUTH_HEADER}" "${READYZ_URL}" 2>/dev/null || true)
-    else
-        HTTP_CODE=$(curl -s -m 3 -o /dev/null -w '%{http_code}' "${READYZ_URL}" 2>/dev/null || true)
-    fi
+    HTTP_CODE=$(curl -s -m 3 -o /dev/null -w '%{http_code}' "${READYZ_URL}${API_KEY_PARAM}" 2>/dev/null || true)
 fi
 if [ "${HTTP_CODE}" = "200" ]; then
     emit_check "readyz_200" "ok" "${READYZ_URL} -> 200"
@@ -173,13 +169,11 @@ if [ -n "${MCP_URL}" ]; then
     if [ -z "${BOARD_ID}" ]; then
         emit_check "mcp_kg_health" "warn" "no active board — skipping KG health (run /okto-pulse:setup first)"
     else
-        if [ -n "${AUTH_HEADER}" ]; then
-            KG_OUT=$(curl -s -m 5 -H "${AUTH_HEADER}" \
-                "${REST_BASE}/api/v1/kg/health?board_id=${BOARD_ID}" 2>/dev/null || true)
-        else
-            KG_OUT=$(curl -s -m 5 \
-                "${REST_BASE}/api/v1/kg/health?board_id=${BOARD_ID}" 2>/dev/null || true)
+        KG_URL="${REST_BASE}/api/v1/kg/health?board_id=${BOARD_ID}"
+        if [ -n "${API_KEY_PARAM}" ]; then
+            KG_URL="${KG_URL}&api_key=${PULSE_API_TOKEN}"
         fi
+        KG_OUT=$(curl -s -m 5 "${KG_URL}" 2>/dev/null || true)
         if [ -n "${KG_OUT}" ] && ! printf '%s' "${KG_OUT}" | grep -E '"detail"' >/dev/null; then
             MCP_OUT="${KG_OUT}"
             emit_check "mcp_kg_health" "ok" "kg_health responded for board ${BOARD_ID}"
@@ -191,13 +185,11 @@ else
     emit_check "mcp_kg_health" "fail" "MCP URL undetermined"
 fi
 
-# ---- Check 8: pulse_api_token set (remote only) -----------------------------
-if [ "${DEPLOY_MODE}" = "remote" ]; then
-    if [ -n "${PULSE_API_TOKEN:-}" ]; then
-        emit_check "pulse_api_token_set" "ok" "token present"
-    else
-        emit_check "pulse_api_token_set" "fail" "PULSE_API_TOKEN missing for remote mode"
-    fi
+# ---- Check 8: pulse_api_token set (all modes) -------------------------------
+if [ -n "${PULSE_API_TOKEN:-}" ]; then
+    emit_check "pulse_api_token_set" "ok" "token present"
+else
+    emit_check "pulse_api_token_set" "fail" "PULSE_API_TOKEN missing (required for all modes)"
 fi
 
 # ---- Check 9: active-board.json exists --------------------------------------

@@ -13,6 +13,7 @@ OKTO_PULSE_PIN_VERSION="${OKTO_PULSE_PIN_VERSION:-0.1.14}"
 OKTO_PULSE_IMAGE="${OKTO_PULSE_IMAGE:-ghcr.io/oktolabsai/okto-pulse:${OKTO_PULSE_PIN_VERSION}}"
 OKTO_PULSE_READYZ_TIMEOUT_SECONDS="${OKTO_PULSE_READYZ_TIMEOUT_SECONDS:-30}"
 PULSE_DOCKER_READYZ_URL="${PULSE_DOCKER_READYZ_URL:-http://127.0.0.1:8101/readyz}"
+PULSE_API_TOKEN="${PULSE_API_TOKEN:-}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/../deploy/docker-compose.yml"
@@ -60,10 +61,14 @@ fi
 
 # ---- 4) Poll /readyz --------------------------------------------------------
 emit_event "wait_readyz"
+API_KEY_PARAM=""
+if [ -n "${PULSE_API_TOKEN}" ]; then
+    API_KEY_PARAM="?api_key=${PULSE_API_TOKEN}"
+fi
 DEADLINE=$(( $(date +%s) + OKTO_PULSE_READYZ_TIMEOUT_SECONDS ))
 READY=0
 while [ "$(date +%s)" -lt "${DEADLINE}" ]; do
-    HTTP_CODE=$(curl -s -m 2 -o /dev/null -w '%{http_code}' "${PULSE_DOCKER_READYZ_URL}" 2>/dev/null || true)
+    HTTP_CODE=$(curl -s -m 2 -o /dev/null -w '%{http_code}' "${PULSE_DOCKER_READYZ_URL}${API_KEY_PARAM}" 2>/dev/null || true)
     if [ "${HTTP_CODE}" = "200" ]; then
         READY=1
         break

@@ -43,15 +43,11 @@ READYZ_URL="${HOST_BASE}/readyz"
 
 # ---- 2) Probe /readyz -------------------------------------------------------
 emit_event "probe_readyz"
-AUTH_HEADER=""
+API_KEY_PARAM=""
 if [ -n "${PULSE_API_TOKEN}" ]; then
-    AUTH_HEADER="Authorization: Bearer ${PULSE_API_TOKEN}"
+    API_KEY_PARAM="?api_key=${PULSE_API_TOKEN}"
 fi
-if [ -n "${AUTH_HEADER}" ]; then
-    HTTP_CODE=$(curl -s -m 5 -o /dev/null -w '%{http_code}' -H "${AUTH_HEADER}" "${READYZ_URL}" 2>/dev/null || true)
-else
-    HTTP_CODE=$(curl -s -m 5 -o /dev/null -w '%{http_code}' "${READYZ_URL}" 2>/dev/null || true)
-fi
+HTTP_CODE=$(curl -s -m 5 -o /dev/null -w '%{http_code}' "${READYZ_URL}${API_KEY_PARAM}" 2>/dev/null || true)
 case "${HTTP_CODE}" in
     200)
         ;;
@@ -68,11 +64,8 @@ esac
 # ---- 3) Probe MCP kg_health -------------------------------------------------
 emit_event "probe_kg_health"
 JSONRPC_BODY='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"okto_pulse_kg_health","arguments":{}}}'
-if [ -n "${AUTH_HEADER}" ]; then
-    MCP_OUT=$(curl -s -m 5 -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -H "${AUTH_HEADER}" -X POST -d "${JSONRPC_BODY}" "${PULSE_MCP_URL}" 2>/dev/null || true)
-else
-    MCP_OUT=$(curl -s -m 5 -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -X POST -d "${JSONRPC_BODY}" "${PULSE_MCP_URL}" 2>/dev/null || true)
-fi
+MCP_URL_WITH_KEY="${PULSE_MCP_URL}${API_KEY_PARAM}"
+MCP_OUT=$(curl -s -m 5 -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -X POST -d "${JSONRPC_BODY}" "${MCP_URL_WITH_KEY}" 2>/dev/null || true)
 if [ -z "${MCP_OUT}" ]; then
     emit_final_err "mcp_unreachable" "MCP kg_health returned no payload"
     exit 20

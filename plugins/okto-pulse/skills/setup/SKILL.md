@@ -25,10 +25,10 @@ completion without further confirmation prompts. On finish you have:
    - `remote` - point at an existing Pulse instance (needs URL + token).
 
 2. **Collect mode-specific values**:
-   - `local-pip`: nothing extra.
-   - `docker`: nothing extra.
+   - `local-pip`: `PULSE_API_TOKEN` (required for auth).
+   - `docker`: `PULSE_API_TOKEN` (required for auth).
    - `remote`: `PULSE_MCP_URL` (must match `^https?://[^/]+/mcp(/.*)?$`)
-     and `PULSE_API_TOKEN` (Bearer token).
+     and `PULSE_API_TOKEN` (required for auth).
 
 3. **Run the matching helper** via `Bash`:
    - `local-pip`: `${CLAUDE_PLUGIN_ROOT}/bin/bootstrap-local-pip.sh`

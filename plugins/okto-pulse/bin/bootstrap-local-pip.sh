@@ -128,10 +128,14 @@ fi
 
 # ---- 5) Poll /readyz --------------------------------------------------------
 emit_event "wait_readyz"
+API_KEY_PARAM=""
+if [ -n "${PULSE_API_TOKEN}" ]; then
+    API_KEY_PARAM="?api_key=${PULSE_API_TOKEN}"
+fi
 DEADLINE=$(( $(date +%s) + OKTO_PULSE_READYZ_TIMEOUT_SECONDS ))
 READY=0
 while [ "$(date +%s)" -lt "${DEADLINE}" ]; do
-    HTTP_CODE=$(curl -s -m 2 -o /dev/null -w '%{http_code}' "${PULSE_LOCAL_READYZ_URL}" 2>/dev/null || true)
+    HTTP_CODE=$(curl -s -m 2 -o /dev/null -w '%{http_code}' "${PULSE_LOCAL_READYZ_URL}${API_KEY_PARAM}" 2>/dev/null || true)
     if [ "${HTTP_CODE}" = "200" ]; then
         READY=1
         break
