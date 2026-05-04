@@ -48,6 +48,11 @@
       "type": "string",
       "title": "Active Pulse board id",
       "description": "Default board for stage skills. Set during /okto-pulse:setup."
+    },
+    "pulse_stress_board_id": {
+      "type": "string",
+      "title": "Stress-test board id",
+      "description": "Pinned board used exclusively by /okto-pulse:stress-test. Set once; never changes."
     }
   }
 }
