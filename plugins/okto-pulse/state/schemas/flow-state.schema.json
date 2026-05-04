@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://oktolabs.ai/schemas/okto-pulse/flow-state.schema.json",
+  "title": "Pulse SDLC flow state",
+  "description": "Tracks where the user is in the SDLC flow and the most recent skill->subagent handoff.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["current_artifact", "current_stage"],
+  "properties": {
+    "current_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "ideation",
+            "refinement",
+            "spec",
+            "sprint",
+            "card",
+            "bug",
+            "decision"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "ideation",
+        "refinement",
+        "spec",
+        "sprint",
+        "card",
+        "validation",
+        "release"
+      ]
+    },
+    "last_handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_skill", "to_subagent", "at"],
+      "properties": {
+        "from_skill": { "type": "string", "minLength": 1 },
+        "to_subagent": { "type": "string", "minLength": 1 },
+        "at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

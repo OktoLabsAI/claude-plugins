@@ -1,0 +1,6 @@
+{
+  "compatible-pulse-range": ">=0.1.14,<0.2",
+  "support-channel": "https://github.com/oktolabsai/claude-plugins/issues",
+  "dependencies": [],
+  "_comment": "OktoLabs-specific metadata; mirrored 1:1 with the okto-pulse pip release per BR br_967ba381. Kept as a sibling of plugin.json because the upstream Claude validator in CLI 2.1.126 rejects the unknown top-level keys. Decisions dec_e4d8bae6 / dec_90a662d2 / dec_e59e2a08 / dec_35c0f3ea remain authoritative."
+}

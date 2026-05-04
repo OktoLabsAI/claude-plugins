@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    name: ci
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[test]" pytest packaging httpx
+
+      - name: claude plugin validate
+        run: tools/ci/validate_plugin.sh
+
+      - name: marketplace lint
+        run: python tools/ci/marketplace_lint.py
+
+      - name: kebab-case check
+        run: python tools/ci/kebab_case_check.py
+
+      - name: userConfig completeness
+        run: python tools/ci/userconfig_completeness.py
+
+      - name: version consistency
+        run: python tools/ci/version_consistency_check.py --installed-pulse-version 0.1.14
+
+      - name: secret scan
+        run: tools/ci/secret_scan.sh
+
+      - name: smoke install
+        run: tools/ci/smoke_install.sh
+
+      - name: pytest
+        run: pytest -v

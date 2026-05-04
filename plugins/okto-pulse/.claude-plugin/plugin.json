@@ -1,0 +1,46 @@
+{
+  "name": "okto-pulse",
+  "version": "0.1.14",
+  "description": "Turnkey Pulse SDLC orchestration in Claude Code: bootstrap, MCP wiring, stage-specialized subagents, hooks, and stress-test.",
+  "author": {
+    "name": "OktoLabs",
+    "email": "devtools@oktolabs.ai",
+    "url": "https://oktolabs.ai"
+  },
+  "homepage": "https://github.com/oktolabsai/claude-plugins/tree/main/plugins/okto-pulse",
+  "repository": "https://github.com/oktolabsai/claude-plugins",
+  "license": "MIT",
+  "keywords": ["sdlc", "okto-pulse", "kanban", "knowledge-graph", "agents"],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": {
+    "okto-pulse": {
+      "type": "http",
+      "url": "${user_config.pulse_mcp_url}",
+      "headers": { "Authorization": "Bearer ${user_config.pulse_api_token}" }
+    }
+  },
+  "userConfig": {
+    "pulse_deploy_mode": {
+      "type": "string",
+      "title": "Pulse deploy mode",
+      "description": "How Pulse runs: local-pip, docker, or remote."
+    },
+    "pulse_mcp_url": {
+      "type": "string",
+      "title": "Pulse MCP URL",
+      "description": "HTTP endpoint of the Pulse MCP server.",
+      "default": "http://127.0.0.1:8101/mcp"
+    },
+    "pulse_api_token": {
+      "type": "string",
+      "title": "Pulse API token",
+      "description": "Bearer token for the Pulse MCP. Required for remote, optional for local.",
+      "sensitive": true
+    },
+    "pulse_board_id": {
+      "type": "string",
+      "title": "Active Pulse board id",
+      "description": "Default board for stage skills. Set during /okto-pulse:setup."
+    }
+  }
+}

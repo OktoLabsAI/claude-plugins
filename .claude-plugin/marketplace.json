@@ -1,0 +1,24 @@
+{
+  "name": "oktolabs-plugins",
+  "description": "OktoLabs Claude Code plugin marketplace.",
+  "owner": {
+    "name": "OktoLabs",
+    "email": "devtools@oktolabs.ai"
+  },
+  "version": "1.0.0",
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "okto-pulse",
+      "description": "Pulse SDLC orchestration plugin (flagship).",
+      "category": "workflow",
+      "tags": ["sdlc", "kanban", "knowledge-graph"],
+      "version": "0.1.14",
+      "author": { "name": "OktoLabs" },
+      "homepage": "https://github.com/oktolabsai/claude-plugins/tree/main/plugins/okto-pulse",
+      "source": "./plugins/okto-pulse"
+    }
+  ]
+}

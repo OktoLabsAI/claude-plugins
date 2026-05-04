@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://oktolabs.ai/schemas/okto-pulse/doctor-cache.schema.json",
+  "title": "Pulse doctor cache",
+  "description": "Most recent /okto-pulse:doctor result; stage skills consult this before hitting MCP.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["last_run_at", "last_status", "checks"],
+  "properties": {
+    "last_run_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_status": {
+      "type": "string",
+      "enum": ["green", "yellow", "red"]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "status": {
+            "type": "string",
+            "enum": ["green", "yellow", "red"]
+          },
+          "detail": { "type": "string" }
+        }
+      }
+    }
+  }
+}

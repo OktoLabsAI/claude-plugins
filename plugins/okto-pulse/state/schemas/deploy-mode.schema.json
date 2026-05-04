@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://oktolabs.ai/schemas/okto-pulse/deploy-mode.schema.json",
+  "title": "Pulse deploy mode",
+  "description": "Captures which deploy mode the user picked at /okto-pulse:setup.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mode", "set_at"],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["local-pip", "docker", "remote"]
+    },
+    "set_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "local_pip": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "python_executable": { "type": "string" },
+            "pulse_version": { "type": "string" },
+            "data_dir": { "type": "string" }
+          }
+        },
+        "docker": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "compose_file": { "type": "string" },
+            "container_name": { "type": "string" },
+            "image": { "type": "string" }
+          }
+        },
+        "remote": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "host": { "type": "string" },
+            "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "tls": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}
