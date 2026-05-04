@@ -14,7 +14,13 @@
 # failed sub-shell to abort the whole diagnostic.
 set -u
 
-DATA_DIR="${CLAUDE_PLUGIN_DATA:-${HOME}/.claude/plugins/data/okto-pulse}"
+# If CLAUDE_PLUGIN_DATA is set but points at a different plugin, fall back to the canonical path.
+_default_data="${HOME}/.claude/plugins/data/okto-pulse-oktolabs-plugins"
+if [ -n "${CLAUDE_PLUGIN_DATA}" ] && printf '%s' "${CLAUDE_PLUGIN_DATA}" | grep -q 'okto-pulse'; then
+    DATA_DIR="${CLAUDE_PLUGIN_DATA}"
+else
+    DATA_DIR="${_default_data}"
+fi
 DEPLOY_MODE_FILE="${DATA_DIR}/deploy-mode.json"
 ACTIVE_BOARD_FILE="${DATA_DIR}/active-board.json"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
