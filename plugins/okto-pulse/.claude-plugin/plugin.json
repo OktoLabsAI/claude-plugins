@@ -1,6 +1,6 @@
 {
   "name": "okto-pulse",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Turnkey Pulse SDLC orchestration in Claude Code: bootstrap, MCP wiring, stage-specialized subagents, hooks, and stress-test.",
   "author": {
     "name": "OktoLabs",
