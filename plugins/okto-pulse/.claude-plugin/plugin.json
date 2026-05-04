@@ -11,7 +11,6 @@
   "repository": "https://github.com/oktolabsai/claude-plugins",
   "license": "MIT",
   "keywords": ["sdlc", "okto-pulse", "kanban", "knowledge-graph", "agents"],
-  "hooks": "./hooks/hooks.json",
   "mcpServers": {
     "okto-pulse": {
       "type": "http",

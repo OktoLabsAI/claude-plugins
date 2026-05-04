@@ -43,4 +43,16 @@ export PULSE_API_TOKEN
 
 claude plugin marketplace add "$REPO_DIR"
 claude plugin install okto-pulse@oktolabs-plugins
-claude plugin list | grep -q 'okto-pulse'
+
+# Verify plugin is present AND loaded successfully (not just present in list)
+PLUGIN_LIST="$(claude plugin list 2>&1)"
+if ! printf '%s' "$PLUGIN_LIST" | grep -q 'okto-pulse'; then
+    printf 'smoke_install: okto-pulse not found in plugin list\n' >&2
+    printf '%s\n' "$PLUGIN_LIST" >&2
+    exit 1
+fi
+if printf '%s' "$PLUGIN_LIST" | grep -A3 'okto-pulse@oktolabs-plugins' | grep -q 'failed to load'; then
+    printf 'smoke_install: okto-pulse failed to load\n' >&2
+    printf '%s\n' "$PLUGIN_LIST" >&2
+    exit 1
+fi
