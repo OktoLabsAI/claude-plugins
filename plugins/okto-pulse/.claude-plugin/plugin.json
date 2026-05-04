@@ -1,6 +1,6 @@
 {
   "name": "okto-pulse",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Turnkey Pulse SDLC orchestration in Claude Code: bootstrap, MCP wiring, stage-specialized subagents, hooks, and stress-test.",
   "author": {
     "name": "OktoLabs",
@@ -10,12 +10,20 @@
   "homepage": "https://github.com/oktolabsai/claude-plugins/tree/main/plugins/okto-pulse",
   "repository": "https://github.com/oktolabsai/claude-plugins",
   "license": "MIT",
-  "keywords": ["sdlc", "okto-pulse", "kanban", "knowledge-graph", "agents"],
+  "keywords": [
+    "sdlc",
+    "okto-pulse",
+    "kanban",
+    "knowledge-graph",
+    "agents"
+  ],
   "mcpServers": {
     "okto-pulse": {
       "type": "http",
       "url": "${user_config.pulse_mcp_url}",
-      "headers": { "Authorization": "Bearer ${user_config.pulse_api_token}" }
+      "headers": {
+        "Authorization": "Bearer ${user_config.pulse_api_token}"
+      }
     }
   },
   "userConfig": {
