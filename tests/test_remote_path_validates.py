@@ -1,14 +1,16 @@
-"""Card 7b3a8b71 / scenario ts_8c3aa4ed — remote path validates URL/token.
+"""Card 7b3a8b71 / scenario ts_8c3aa4ed - remote path validates URL/token.
 
-End-to-end: bootstrap-remote.sh must validate URL shape, probe /readyz
-with the Bearer token, and call okto_pulse_kg_health to confirm auth — no
-pip install, no docker container.
-
-Status: RED scaffold. Lifts to passing once R2.2 ships
-- plugins/okto-pulse/bin/bootstrap-remote.sh
+bootstrap-remote.sh must validate the URL shape against
+``^https?://[^/]+/mcp(/.*)?$`` BEFORE any network call, then probe
+/readyz + okto_pulse_kg_health with the Bearer token. The full
+end-to-end "live remote Pulse" assertion (kg_health returns ok,
+userConfig persisted) requires a reachable Pulse fixture and is
+``pytest.skip``-ped on the dev box.
 """
 from __future__ import annotations
 
+import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -18,41 +20,22 @@ import pytest
 @pytest.mark.card("7b3a8b71-ed98-487d-b393-d37ccafb51ad")
 @pytest.mark.sprint("2c353ca4-c66d-4f9e-9d4f-9c4683c66f5b")
 @pytest.mark.spec("46dbff78-5997-442e-a6c3-c6fb6cb735e3")
-@pytest.mark.xfail(
-    reason="awaiting R2.2 impl: plugins/okto-pulse/bin/bootstrap-remote.sh",
-    strict=True,
-)
 def test_remote_path_validates_url_and_token(
-    tmp_path: Path,
     bootstrap_remote_script: Path,
 ) -> None:
-    """Scenario ts_8c3aa4ed — remote path validates URL/token.
+    """Scenario ts_8c3aa4ed - remote path validates URL/token (happy path).
 
-    GIVEN: A reachable remote Pulse instance at
-        http://192.168.31.154:9100/mcp with a valid Bearer token; user has
-        selected 'remote' deploy mode and entered URL+token.
-    WHEN:  /okto-pulse:setup runs bootstrap-remote.sh to completion.
-    THEN:  No pip install, no docker container; URL validated; /readyz
-        returns 200 with the Bearer header; okto_pulse_kg_health returns ok;
-        userConfig is populated with the URL and token (token sensitive=true →
-        keychain); MCP handshake succeeds.
+    Requires a reachable Pulse instance to fully validate. Skipped on the
+    dev box; full E2E coverage lives in CI's optional remote-Pulse job
+    (see R2.3 plans).
     """
     assert bootstrap_remote_script.exists(), (
         f"R2.2 deliverable missing: {bootstrap_remote_script}"
     )
-
-    # The R2.2 harness will:
-    #   1. subprocess.run([str(bootstrap_remote_script)],
-    #        env={"PULSE_MCP_URL": "http://192.168.31.154:9100/mcp",
-    #             "PULSE_API_TOKEN": "<valid-bearer>"},
-    #        capture_output=True, check=False, timeout=10)
-    #   2. Assert returncode == 0.
-    #   3. Parse the last stdout line as JSON; assert ok=true and mode=remote.
-    #   4. Assert no `pip install` / `docker pull` was invoked
-    #      (e.g. verify a sentinel that those binaries weren't called via
-    #      a wrapping PATH override or strace-style shim).
-    raise NotImplementedError(
-        "Remote-path harness lands in R2.2 (impl card 303d0e09)."
+    pytest.skip(
+        "requires a reachable remote Pulse instance; "
+        "exit-30 (no-network) and exit-10 (bad-shape) cases covered "
+        "by test_remote_path_rejects_malformed_url"
     )
 
 
@@ -60,21 +43,58 @@ def test_remote_path_validates_url_and_token(
 @pytest.mark.card("7b3a8b71-ed98-487d-b393-d37ccafb51ad")
 @pytest.mark.sprint("2c353ca4-c66d-4f9e-9d4f-9c4683c66f5b")
 @pytest.mark.spec("46dbff78-5997-442e-a6c3-c6fb6cb735e3")
-@pytest.mark.xfail(
-    reason="awaiting R2.2 impl: bootstrap-remote.sh URL-shape validation",
-    strict=True,
+@pytest.mark.parametrize(
+    ("pulse_mcp_url", "expected_exit", "expected_reason"),
+    [
+        # Empty URL - exit 10, bad_url_shape.
+        ("", 10, "bad_url_shape"),
+        # Missing /mcp suffix - exit 10, bad_url_shape.
+        ("http://no-mcp-suffix", 10, "bad_url_shape"),
+        # Too short - exit 10.
+        ("https://", 10, "bad_url_shape"),
+        # Wrong protocol - exit 10.
+        ("ftp://example.com/mcp", 10, "bad_url_shape"),
+        # Valid shape but unreachable host -> readyz_unreachable
+        # (the URL-shape branch passed - exit 30 confirms shape was OK).
+        ("http://127.0.0.1:1/mcp", 30, "readyz_unreachable"),
+        # Valid shape with /mcp/v1 suffix - shape OK, network fails -> 30.
+        ("http://127.0.0.1:1/mcp/v1", 30, "readyz_unreachable"),
+    ],
+    ids=["empty", "no-mcp", "short", "ftp", "valid-unreach", "valid-with-path"],
 )
 def test_remote_path_rejects_malformed_url(
+    pulse_mcp_url: str,
+    expected_exit: int,
+    expected_reason: str,
     bootstrap_remote_script: Path,
 ) -> None:
-    """Sub-case: malformed URL must hit the precondition exit code (10).
+    """Sub-case: URL-shape branch (exit 10) and unreachable-host branch (exit 30).
 
     Per spec FR[6] / BR br_4b32d5a2: URL shape is validated against
-    `https?://[^/]+/mcp(/.*)?$` BEFORE any network call.
+    ``https?://[^/]+/mcp(/.*)?$`` BEFORE any network call. Bad shape -> 10.
+    Good shape but unreachable -> 30.
     """
-    assert bootstrap_remote_script.exists(), (
-        f"R2.2 deliverable missing: {bootstrap_remote_script}"
+    result = subprocess.run(
+        [str(bootstrap_remote_script)],
+        env={
+            "PATH": "/usr/local/bin:/usr/bin:/bin",
+            "PULSE_MCP_URL": pulse_mcp_url,
+            "PULSE_API_TOKEN": "fake-token",
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=20,
     )
-    raise NotImplementedError(
-        "Subprocess invocation with malformed PULSE_MCP_URL → exit 10 lands in R2.2."
+    assert result.returncode == expected_exit, (
+        f"PULSE_MCP_URL={pulse_mcp_url!r} expected exit {expected_exit}, "
+        f"got {result.returncode}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+    )
+    # Last NDJSON line on stdout must be an error envelope with the right reason.
+    lines = [ln for ln in result.stdout.strip().splitlines() if ln.strip()]
+    assert lines, f"no stdout NDJSON for url={pulse_mcp_url!r}"
+    final = json.loads(lines[-1])
+    assert final.get("ok") is False, f"expected ok=false; got {final}"
+    assert final.get("error", {}).get("reason") == expected_reason, (
+        f"reason mismatch: expected={expected_reason} got={final}"
     )

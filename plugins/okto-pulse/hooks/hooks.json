@@ -1,1 +1,39 @@
-{"hooks": {}}
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-pulse-up.sh", "timeout": 5}
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-pulse-up.sh", "timeout": 5}
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/consolidate-on-compact.sh"}
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/stop-validation-gate.sh"}
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/task-completed-card-sync.sh"}
+        ]
+      }
+    ]
+  }
+}

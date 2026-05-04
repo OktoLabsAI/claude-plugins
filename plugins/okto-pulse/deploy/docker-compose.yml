@@ -1,0 +1,16 @@
+services:
+  okto-pulse:
+    image: ${OKTO_PULSE_IMAGE}
+    container_name: okto-pulse
+    ports:
+      - "8101:8101"
+    volumes:
+      - okto-pulse-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:8101/readyz"]
+      interval: 5s
+      timeout: 2s
+      retries: 6
+volumes:
+  okto-pulse-data:
+    name: okto-pulse-data
