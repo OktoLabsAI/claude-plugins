@@ -37,8 +37,9 @@ if ! printf '%s' "${PULSE_MCP_URL}" | grep -E '^https?://[^/]+/mcp(/.*)?$' >/dev
     exit 10
 fi
 
-# Derive the readyz URL (strip a trailing /mcp* path, append /readyz).
-HOST_BASE=$(printf '%s' "${PULSE_MCP_URL}" | sed -E 's@/mcp(/.*)?$@@')
+# Derive the readyz URL (strip query string first, then /mcp* path, append /readyz).
+MCP_BASE=$(printf '%s' "${PULSE_MCP_URL}" | sed -E 's@\?.*$@@')
+HOST_BASE=$(printf '%s' "${MCP_BASE}" | sed -E 's@/mcp(/.*)?$@@')
 READYZ_URL="${HOST_BASE}/readyz"
 
 # ---- 2) Probe /readyz -------------------------------------------------------

@@ -71,7 +71,8 @@ if [ -z "${READYZ_URL}" ] || [ -z "${MCP_URL}" ]; then
         remote)
             if [ -n "${PULSE_MCP_URL:-}" ]; then
                 MCP_URL="${PULSE_MCP_URL}"
-                READYZ_URL=$(printf '%s' "${PULSE_MCP_URL}" | sed -E 's@/mcp(/.*)?$@@')/readyz
+                MCP_BASE=$(printf '%s' "${PULSE_MCP_URL}" | sed -E 's@\?.*$@@')
+                READYZ_URL=$(printf '%s' "${MCP_BASE}" | sed -E 's@/mcp(/.*)?$@@')/readyz
             fi
             ;;
     esac

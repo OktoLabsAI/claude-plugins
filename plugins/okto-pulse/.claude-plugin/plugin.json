@@ -1,6 +1,6 @@
 {
   "name": "okto-pulse",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Turnkey Pulse SDLC orchestration in Claude Code: bootstrap, MCP wiring, stage-specialized subagents, hooks, and stress-test.",
   "author": {
     "name": "OktoLabs",
@@ -20,7 +20,7 @@
   "mcpServers": {
     "okto-pulse": {
       "type": "http",
-      "url": "${user_config.pulse_mcp_url}?api_key=${user_config.pulse_api_token}"
+      "url": "${user_config.pulse_mcp_url}"
     }
   },
   "userConfig": {
@@ -32,8 +32,7 @@
     "pulse_mcp_url": {
       "type": "string",
       "title": "Pulse MCP URL",
-      "description": "HTTP endpoint of the Pulse MCP server.",
-      "default": "http://127.0.0.1:8101/mcp"
+      "description": "Full MCP URL including ?api_key= param. Set automatically by /okto-pulse:setup."
     },
     "pulse_api_token": {
       "type": "string",

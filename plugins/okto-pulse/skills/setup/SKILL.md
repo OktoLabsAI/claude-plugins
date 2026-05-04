@@ -25,9 +25,9 @@ completion without further confirmation prompts. On finish you have:
    - `remote` - point at an existing Pulse instance (needs URL + token).
 
 2. **Collect mode-specific values**:
-   - `local-pip`: `PULSE_API_TOKEN` (required for auth).
-   - `docker`: `PULSE_API_TOKEN` (required for auth).
-   - `remote`: `PULSE_MCP_URL` (must match `^https?://[^/]+/mcp(/.*)?$`)
+   - `local-pip`: base MCP URL (default `http://127.0.0.1:8101/mcp`) and `PULSE_API_TOKEN` (required for auth).
+   - `docker`: base MCP URL (default `http://127.0.0.1:8101/mcp`) and `PULSE_API_TOKEN` (required for auth).
+   - `remote`: `PULSE_MCP_URL` (base URL, must match `^https?://[^/]+/mcp(/.*)?$`)
      and `PULSE_API_TOKEN` (required for auth).
 
 3. **Run the matching helper** via `Bash`:
@@ -40,8 +40,10 @@ completion without further confirmation prompts. On finish you have:
    final NDJSON line's `error.message` and abort.
 
 4. **Persist `userConfig`** (via the Claude Code plugin runtime):
-   `pulse_deploy_mode`, `pulse_mcp_url`, `pulse_api_token` (sensitive,
-   keychain-backed), `pulse_board_id`.
+   - `pulse_deploy_mode`: the chosen mode.
+   - `pulse_mcp_url`: construct as `${BASE_URL}?api_key=${PULSE_API_TOKEN}` (full URL with auth param).
+   - `pulse_api_token` (sensitive, keychain-backed): stored separately for use by doctor/bootstrap scripts.
+   - `pulse_board_id`: set after board picker in step 6.
 
 5. **Run `/okto-pulse:doctor`**. Abort if any check is `fail` (red).
 
