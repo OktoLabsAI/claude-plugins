@@ -151,18 +151,35 @@ else
     emit_check "readyz_200" "fail" "${READYZ_URL:-<unset>} -> ${HTTP_CODE:-no-response}"
 fi
 
-# ---- Check 7: MCP handshake (kg_health) -------------------------------------
+# ---- Check 7: KG health via REST API (MCP uses SSE sessions; not curl-able) -
+# Derives REST base URL from MCP URL; for local-pip maps port 8101→8100.
+MCP_OUT=""
 if [ -n "${MCP_URL}" ]; then
-    JSONRPC='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"okto_pulse_kg_health","arguments":{}}}'
-    if [ -n "${AUTH_HEADER}" ]; then
-        MCP_OUT=$(curl -s -m 5 -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -H "${AUTH_HEADER}" -X POST -d "${JSONRPC}" "${MCP_URL}" 2>/dev/null || true)
-    else
-        MCP_OUT=$(curl -s -m 5 -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -X POST -d "${JSONRPC}" "${MCP_URL}" 2>/dev/null || true)
+    REST_BASE=$(printf '%s' "${MCP_URL}" | sed -E 's@/mcp(/.*)?$@@')
+    if [ "${DEPLOY_MODE}" = "local-pip" ]; then
+        REST_BASE=$(printf '%s' "${REST_BASE}" | sed -E 's/:8101\b/:8100/')
     fi
-    if [ -n "${MCP_OUT}" ] && ! printf '%s' "${MCP_OUT}" | grep -E '"error"\s*:' >/dev/null; then
-        emit_check "mcp_kg_health" "ok" "kg_health responded"
+    BOARD_ID=""
+    if [ -f "${ACTIVE_BOARD_FILE}" ]; then
+        BOARD_ID=$(grep -E '"board_id"' "${ACTIVE_BOARD_FILE}" 2>/dev/null | head -1 \
+            | sed -E 's/.*"board_id"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/' || true)
+    fi
+    if [ -z "${BOARD_ID}" ]; then
+        emit_check "mcp_kg_health" "warn" "no active board — skipping KG health (run /okto-pulse:setup first)"
     else
-        emit_check "mcp_kg_health" "fail" "kg_health did not respond cleanly"
+        if [ -n "${AUTH_HEADER}" ]; then
+            KG_OUT=$(curl -s -m 5 -H "${AUTH_HEADER}" \
+                "${REST_BASE}/api/v1/kg/health?board_id=${BOARD_ID}" 2>/dev/null || true)
+        else
+            KG_OUT=$(curl -s -m 5 \
+                "${REST_BASE}/api/v1/kg/health?board_id=${BOARD_ID}" 2>/dev/null || true)
+        fi
+        if [ -n "${KG_OUT}" ] && ! printf '%s' "${KG_OUT}" | grep -E '"detail"' >/dev/null; then
+            MCP_OUT="${KG_OUT}"
+            emit_check "mcp_kg_health" "ok" "kg_health responded for board ${BOARD_ID}"
+        else
+            emit_check "mcp_kg_health" "fail" "kg_health did not respond cleanly: ${KG_OUT:-no-response}"
+        fi
     fi
 else
     emit_check "mcp_kg_health" "fail" "MCP URL undetermined"
