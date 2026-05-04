@@ -14,10 +14,6 @@ from pathlib import Path
 
 import pytest
 
-from .scenarios import SCENARIOS
-
-_S = SCENARIOS["ts_d6d14d62"]
-
 # Constants pinned by the spec — keep here so the test is the source of
 # truth the impl must match.
 PLUGIN_VERSION_UNDER_TEST = "0.1.14"
@@ -37,9 +33,14 @@ def test_compatible_pulse_range_excludes_next_major(
     tmp_path: Path,
     version_consistency_check_script: Path,
 ) -> None:
-    f"""GIVEN: {_S['given']}
-    WHEN:  {_S['when']}
-    THEN:  {_S['then']}
+    """Scenario ts_d6d14d62 — compatible-pulse-range excludes next major.
+
+    GIVEN: plugin.json#version is 0.1.14 and compatible-pulse-range is
+        ">=0.1.14, <0.2"; CI is testing against okto-pulse pip 0.2.0.
+    WHEN:  CI version-consistency check parses the range and compares
+        against the installed pip version.
+    THEN:  Check fails with a message that 0.2.0 is outside the
+        compatible range; PR is blocked from merging.
     """
     # Precondition — script is an R1.2 deliverable.
     assert version_consistency_check_script.exists(), (

@@ -15,10 +15,6 @@ from pathlib import Path
 
 import pytest
 
-from .scenarios import SCENARIOS
-
-_S = SCENARIOS["ts_659675c6"]
-
 
 @pytest.mark.scenario("ts_659675c6")
 @pytest.mark.card("c052f2c8-29e0-44f9-8b9b-62be12f210f2")
@@ -38,11 +34,16 @@ def test_no_token_install_works(
     deploy_mode: str,
     mcp_url: str,
 ) -> None:
-    f"""GIVEN: {_S['given']}
-    WHEN:  {_S['when']}
-    THEN:  {_S['then']}
+    """Scenario ts_659675c6 — no-token install in local-pip + docker.
 
-    Parametrized over deploy_mode in {{"local-pip", "docker"}}.
+    GIVEN: A user installs the plugin and selects local-pip (or docker)
+        deploy mode in /okto-pulse:setup; pulse_api_token is left empty.
+    WHEN:  Plugin is enabled and the MCP server is contacted at
+        http://127.0.0.1:8101/mcp without an Authorization header.
+    THEN:  MCP handshake succeeds; tool calls work; setup proceeds to the
+        board picker; no error about missing token.
+
+    Parametrized over deploy_mode in {"local-pip", "docker"}.
     """
     # Preconditions — both manifest and harness are R1.2 deliverables.
     assert plugin_json_path.exists(), (

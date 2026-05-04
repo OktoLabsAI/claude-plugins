@@ -53,7 +53,7 @@ pip install -e ".[test]"
 pytest
 ```
 
-Expected current state: **4 xfail, 0 passed, 0 failed.**
+Expected current state: **5 xfailed, 0 passed, 0 failed** (Card 4 is parametrized over `local-pip` and `docker` deploy modes, so it contributes 2 xfail rows).
 
 ## License
 

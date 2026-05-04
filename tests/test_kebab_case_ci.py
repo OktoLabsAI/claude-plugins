@@ -12,10 +12,6 @@ from pathlib import Path
 
 import pytest
 
-from .scenarios import SCENARIOS
-
-_S = SCENARIOS["ts_e53d04fb"]
-
 
 @pytest.mark.scenario("ts_e53d04fb")
 @pytest.mark.card("3a62aad0-45b3-4faa-8c99-9250d863e80a")
@@ -29,9 +25,14 @@ def test_kebab_case_violation_fails_ci(
     tmp_path: Path,
     kebab_case_check_script: Path,
 ) -> None:
-    f"""GIVEN: {_S['given']}
-    WHEN:  {_S['when']}
-    THEN:  {_S['then']}
+    """Scenario ts_e53d04fb — kebab-case violation fails CI.
+
+    GIVEN: A PR adds a skill directory named skills/StressTest/SKILL.md
+        (PascalCase) violating kebab-case.
+    WHEN:  CI runs the kebab-case enforcer as part of the 7-check suite.
+    THEN:  The kebab-case check fails with the offending path; PR cannot
+        be merged; the other 6 checks may still run but the overall gate
+        is failed.
     """
     # Build the offending fixture: a PascalCase skill directory
     # plugins/okto-pulse/skills/StressTest/SKILL.md

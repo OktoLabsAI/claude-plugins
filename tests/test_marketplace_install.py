@@ -15,10 +15,6 @@ from pathlib import Path
 
 import pytest
 
-from .scenarios import SCENARIOS
-
-_S = SCENARIOS["ts_d3c447de"]
-
 
 @pytest.mark.scenario("ts_d3c447de")
 @pytest.mark.card("ae5f23bb-a3a5-4967-987a-cc3e392e7189")
@@ -36,9 +32,14 @@ def test_fresh_install_via_marketplace_shows_plugin(
     plugin_json_path: Path,
     smoke_install_script: Path,
 ) -> None:
-    f"""GIVEN: {_S['given']}
-    WHEN:  {_S['when']}
-    THEN:  {_S['then']}
+    """Scenario ts_d3c447de — fresh install via marketplace shows plugin.
+
+    GIVEN: A clean Claude Code installation with no oktolabs-plugins
+        marketplace registered and no okto-pulse plugin installed.
+    WHEN:  User runs /plugin marketplace add oktolabsai/claude-plugins
+        followed by /plugin install okto-pulse@oktolabs-plugins.
+    THEN:  The /plugin list output includes an entry for okto-pulse with
+        the version from plugin.json and source pointing to the marketplace.
     """
     # Preconditions — these resources are R1.2 deliverables.
     assert marketplace_json_path.exists(), (
