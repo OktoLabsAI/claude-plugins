@@ -1,7 +1,7 @@
 {
   "name": "okto-pulse",
-  "version": "0.1.19",
-  "description": "Turnkey Pulse SDLC orchestration in Claude Code: bootstrap, MCP wiring, stage-specialized subagents, hooks, and stress-test.",
+  "version": "0.2.5",
+  "description": "Pulse SDLC orchestration in Claude Code: a flow router dispatches every non-card stage to a specialist subagent (ideation-analyst, refinement-investigator, spec-writer, architect, sprint-planner, implementer, qa-engineer, kg-curator) via the Task tool; each agent loads its paired procedural skill via the Skill tool and executes it in zero-confirmation isolated context. Card stage fans out per-card agents in parallel dependency waves. Includes bootstrap, MCP wiring, hooks, and stress-test.",
   "author": {
     "name": "OktoLabs",
     "email": "devtools@oktolabs.ai",

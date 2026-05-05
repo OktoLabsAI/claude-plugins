@@ -4,8 +4,8 @@
 # Card 303d0e09. Implements FR/TR/BR for /okto-pulse:setup remote path.
 # - Validate URL shape against ^https?://[^/]+/mcp(/.*)?$ (exit 10 on miss).
 # - Probe the readyz endpoint (URL with /mcp stripped, /readyz appended)
-#   with the Bearer token. 401/403 -> exit 20. Anything else (timeout,
-#   network) -> exit 30.
+#   carrying the api_key as a query-string parameter. 401/403 -> exit 20.
+#   Anything else (timeout, network) -> exit 30.
 # - Probe MCP kg_health via POST. Failure -> exit 20.
 # - No install or container actions.
 # - Final NDJSON: {"ok":true,"mode":"remote",...}.
@@ -53,7 +53,7 @@ case "${HTTP_CODE}" in
     200)
         ;;
     401|403)
-        emit_final_err "auth_failed" "/readyz returned ${HTTP_CODE}; Bearer token rejected"
+        emit_final_err "auth_failed" "/readyz returned ${HTTP_CODE}; api_key rejected"
         exit 20
         ;;
     *)

@@ -16,15 +16,26 @@ set -u
 
 # If CLAUDE_PLUGIN_DATA is set but points at a different plugin, fall back to the canonical path.
 _default_data="${HOME}/.claude/plugins/data/okto-pulse-oktolabs-plugins"
-if [ -n "${CLAUDE_PLUGIN_DATA}" ] && printf '%s' "${CLAUDE_PLUGIN_DATA}" | grep -q 'okto-pulse'; then
+if [ -n "${CLAUDE_PLUGIN_DATA:-}" ] && printf '%s' "${CLAUDE_PLUGIN_DATA:-}" | grep -q 'okto-pulse'; then
     DATA_DIR="${CLAUDE_PLUGIN_DATA}"
 else
     DATA_DIR="${_default_data}"
 fi
 DEPLOY_MODE_FILE="${DATA_DIR}/deploy-mode.json"
-ACTIVE_BOARD_FILE="${DATA_DIR}/active-board.json"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/../deploy/docker-compose.yml"
+
+# Per-project state directory: resolve via shipped helper. Falls back to the
+# global DATA_DIR if the helper is unavailable so a missing python3 doesn't
+# break the diagnostic. The helper handles legacy → per-project migration.
+RESOLVE_PY="${SCRIPT_DIR}/../scripts/resolve_project_state.py"
+if command -v python3 >/dev/null 2>&1 && [ -f "${RESOLVE_PY}" ]; then
+    STATE_DIR=$(python3 "${RESOLVE_PY}" --cwd "${PWD}" 2>/dev/null || true)
+fi
+if [ -z "${STATE_DIR:-}" ]; then
+    STATE_DIR="${DATA_DIR}"
+fi
+ACTIVE_BOARD_FILE="${STATE_DIR}/active-board.json"
 
 # Detect deploy mode (default local-pip when file missing).
 DEPLOY_MODE="local-pip"

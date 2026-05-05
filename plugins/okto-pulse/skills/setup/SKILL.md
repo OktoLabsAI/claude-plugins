@@ -48,15 +48,20 @@ completion without further confirmation prompts. On finish you have:
 5. **Run `/okto-pulse:doctor`**. Abort if any check is `fail` (red).
 
 6. **Active-board picker**: call `okto_pulse_list_my_boards`, prompt
-   the user to choose, then write
-   `${CLAUDE_PLUGIN_DATA}/active-board.json` atomically using the
-   shipped helper:
+   the user to choose, then resolve the per-project state directory
+   and write `active-board.json` atomically:
 
    ```bash
+   STATE_DIR=$(python3 "${CLAUDE_PLUGIN_ROOT}/scripts/resolve_project_state.py" --cwd "$PWD")
    python3 "${CLAUDE_PLUGIN_ROOT}/scripts/atomic_write.py" \
-     "${CLAUDE_PLUGIN_DATA}/active-board.json" \
+     "$STATE_DIR/active-board.json" \
      '{"board_id":"<uuid>","board_name":"<name>","set_at":"<iso8601>","set_by":"setup"}'
    ```
+
+   Per-project state means each project (resolved via `git rev-parse
+   --show-toplevel` or absolute cwd) gets its own `active-board.json`
+   under `${CLAUDE_PLUGIN_DATA}/projects/<key>/`. Switching projects
+   no longer clobbers another project's active board.
 
 ## Safety
 

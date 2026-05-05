@@ -15,7 +15,19 @@ if [ ! -t 0 ]; then
 fi
 
 DATA_DIR="${CLAUDE_PLUGIN_DATA:-${HOME}/.claude/plugins/data/okto-pulse}"
-ACTIVE_BOARD_FILE="${DATA_DIR}/active-board.json"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Per-project state: resolve via shipped helper. Fall back to legacy global
+# path if python3 / helper is unavailable.
+RESOLVE_PY="${SCRIPT_DIR}/resolve_project_state.py"
+STATE_DIR=""
+if command -v python3 >/dev/null 2>&1 && [ -f "${RESOLVE_PY}" ]; then
+    STATE_DIR=$(python3 "${RESOLVE_PY}" --cwd "${PWD}" 2>/dev/null || true)
+fi
+if [ -z "${STATE_DIR}" ]; then
+    STATE_DIR="${DATA_DIR}"
+fi
+ACTIVE_BOARD_FILE="${STATE_DIR}/active-board.json"
 
 MCP_URL="${PULSE_MCP_URL:-http://127.0.0.1:8101/mcp}"
 MCP_CURL="${MCP_CURL:-curl}"

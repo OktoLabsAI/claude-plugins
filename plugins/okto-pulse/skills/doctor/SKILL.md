@@ -12,7 +12,8 @@ Read-only diagnosis followed by an opt-in remediation loop.
 
 ## Steps
 
-1. **Run the diagnostic** via `Bash`:
+1. **Run the diagnostic** via `Bash`. The script resolves the per-project state directory internally
+   (via `scripts/resolve_project_state.py`) before reading `active-board.json`:
 
    ```bash
    bash "${CLAUDE_PLUGIN_ROOT}/bin/doctor.sh"

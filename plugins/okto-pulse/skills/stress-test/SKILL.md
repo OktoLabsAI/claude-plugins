@@ -3,7 +3,7 @@ description: Stress-test the Pulse SDLC flow with 10 parallel ideations on a pin
 when_to_use: Run before releases to validate no cross-contamination between concurrent flows. Manual only.
 disable-model-invocation: true
 user-invocable: true
-allowed-tools: Bash, Read, Write, AskUserQuestion
+allowed-tools: Bash, Read, Write, AskUserQuestion, mcp__plugin_okto-pulse_okto-pulse__okto_pulse_archive_tree, mcp__plugin_okto-pulse_okto-pulse__okto_pulse_create_ideation, mcp__plugin_okto-pulse_okto-pulse__okto_pulse_get_traceability_report
 ---
 
 # okto-pulse:stress-test

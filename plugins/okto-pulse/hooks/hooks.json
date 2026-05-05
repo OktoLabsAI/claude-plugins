@@ -4,18 +4,21 @@
       {
         "matcher": "startup",
         "hooks": [
-          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-pulse-up.sh", "timeout": 5}
+          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-pulse-up.sh", "timeout": 5},
+          {"type": "command", "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/session_start_pulse_ping.py", "timeout": 2}
         ]
       },
       {
         "matcher": "resume",
         "hooks": [
-          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-pulse-up.sh", "timeout": 5}
+          {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-pulse-up.sh", "timeout": 5},
+          {"type": "command", "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/session_start_pulse_ping.py", "timeout": 2}
         ]
       }
     ],
     "PreCompact": [
       {
+        "matcher": "*",
         "hooks": [
           {"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/consolidate-on-compact.sh"}
         ]

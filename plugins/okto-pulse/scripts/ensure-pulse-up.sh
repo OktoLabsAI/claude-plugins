@@ -47,6 +47,11 @@ fi
 # Indirection seam: tests can swap MCP_CURL=/path/to/mock to short-circuit
 # the network. Default to plain curl.
 MCP_CURL="${MCP_CURL:-curl}"
+# AUTH NOTE: This legacy SessionStart helper still uses ``Authorization: Bearer``
+# for backward compatibility — the live MCP HTTP transport actually requires the
+# token as a ``?api_key=...`` query parameter (see hooks/session_start_pulse_ping.py
+# and the v0.1.16-v0.1.19 fix history). Bearer was rejected by the server in those
+# versions; this script is grandfathered, scheduled for migration in v0.3.0.
 AUTH_HEADER=""
 if [ -n "${PULSE_API_TOKEN:-}" ]; then
     AUTH_HEADER="Authorization: Bearer ${PULSE_API_TOKEN}"
