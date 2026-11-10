@@ -12,8 +12,8 @@ Project key derivation
 Project root = ``git rev-parse --show-toplevel`` if cwd is in a repo,
 else the absolute cwd. Canonicalize the same way Claude Code does for
 ``~/.claude/projects/``: replace ``/`` with ``-`` and prefix with ``-``.
-Example: ``/Users/maheidem/Documents/dev/OktoLabsAI`` →
-``-Users-maheidem-Documents-dev-OktoLabsAI``.
+Example: ``/Users/oktolabsai-dev/Documents/dev/OktoLabsAI`` →
+``-Users-oktolabsai-dev-Documents-dev-OktoLabsAI``.
 
 Migration
 ---------
